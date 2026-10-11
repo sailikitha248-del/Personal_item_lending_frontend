@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -18,4 +18,4 @@ If you are developing a production application, we recommend using TypeScript wi
 =======
 # Personal-_item_lending_frontend_
 A React-based web application to manage personal items, track lending and borrowing transactions, record returns, and monitor upcoming or overdue return dates.
->>>>>>> 3171d40f059497f332f4d5aeb01c9a1e85f7ea1d
+
