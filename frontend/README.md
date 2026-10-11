@@ -148,20 +148,23 @@ Screenshots of the application interface will be added here.
 
 ### Dashboard
 
-![alt text](image.png)
+<img width="1463" height="902" alt="Screenshot 2026-10-11 200650" src="https://github.com/user-attachments/assets/7da6abf4-83aa-4744-907b-07e8cc533dae" />
+
 
 ### Item Management
-![alt text](image-1.png)
+<img width="1382" height="843" alt="Screenshot 2026-10-11 200707" src="https://github.com/user-attachments/assets/2a34948c-d091-4b25-8c63-e9f33127d4f5" />
+
 
 ### Lending and Borrowing
+<img width="862" height="816" alt="Screenshot 2026-10-11 200734" src="https://github.com/user-attachments/assets/b670016c-4c4d-463d-b904-714f761b01a8" />
 
-![alt text](image-2.png)
 ### Returns
+<img width="710" height="597" alt="Screenshot 2026-10-11 200743" src="https://github.com/user-attachments/assets/9a6370c1-7932-4248-a483-1d749777f97a" />
 
 
 ### Reminders
+<img width="847" height="723" alt="Screenshot 2026-10-11 200756" src="https://github.com/user-attachments/assets/a0b478f0-63c2-4cb1-8323-3fbc45ec4d9b" />
 
-![alt text](image-3.png)
 
 ## 10. Data Storage
 
