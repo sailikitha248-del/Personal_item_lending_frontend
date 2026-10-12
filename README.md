@@ -42,7 +42,7 @@ Create the database:
 CREATE DATABASE personal_item_lending;
 ```
 
-Configure your database connection in the backend's `application.properties` file. Set the `DB_PASSWORD` environment variable to your MySQL password.
+Configure the database connection in the backend's `application.properties` file. Set the `DB_PASSWORD` environment variable to your MySQL password.
 
 ### 2. Start the Backend
 
