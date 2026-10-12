@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:8080/api";
+const API_URL = "https://personal-item-lending-backend.onrender.com/api";
 
 function Returns() {
   const [transactions, setTransactions] = useState([]);
