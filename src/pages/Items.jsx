@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:8080/api/items";
+const API_URL = "https://personal-item-lending-backend.onrender.com/api/items";
 
 export default function Items() {
   const [items, setItems] = useState([]);
