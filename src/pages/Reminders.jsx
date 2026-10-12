@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-const TRANSACTIONS_API = "http://localhost:8080/api/transactions";
-const ITEMS_API = "http://localhost:8080/api/items";
+const TRANSACTIONS_API = "https://personal-item-lending-backend.onrender.com/api/transactions";
+const ITEMS_API = "https://personal-item-lending-backend.onrender.com/api/items";
+
 
 function Reminders() {
   const [records, setRecords] = useState([]);
