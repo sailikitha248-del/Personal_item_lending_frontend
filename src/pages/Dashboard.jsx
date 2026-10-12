@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
+<<<<<<< HEAD
 const API = "https://personal-item-lending-backend.onrender.com/api";
+=======
+const DASHBOARD_API = "https://personal-item-lending-backend.onrender.com/api/dashboard";
+const TRANSACTIONS_API = "https://personal-item-lending-backend.onrender.com/api/transactions";
+
+>>>>>>> c424e2c9ec3c4b96d54f55c39a3cad8e5ec7378a
 
 function Dashboard() {
   const [stats, setStats] = useState({
