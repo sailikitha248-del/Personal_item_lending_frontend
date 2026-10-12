@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
 
-<<<<<<< HEAD
 const API = "https://personal-item-lending-backend.onrender.com/api";
-=======
-const DASHBOARD_API = "https://personal-item-lending-backend.onrender.com/api/dashboard";
-const TRANSACTIONS_API = "https://personal-item-lending-backend.onrender.com/api/transactions";
-
->>>>>>> c424e2c9ec3c4b96d54f55c39a3cad8e5ec7378a
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -29,6 +23,7 @@ function Dashboard() {
         setError("");
 
         const response = await fetch(`${API}/dashboard`);
+
         if (!response.ok) {
           throw new Error(`Dashboard API error: ${response.status}`);
         }
@@ -36,10 +31,11 @@ function Dashboard() {
         const data = await response.json();
         setStats(data);
 
-        const [transactionResponse, itemResponse] = await Promise.all([
-          fetch(`${API}/transactions`),
-          fetch(`${API}/items`),
-        ]);
+        const [transactionResponse, itemResponse] =
+          await Promise.all([
+            fetch(`${API}/transactions`),
+            fetch(`${API}/items`),
+          ]);
 
         if (transactionResponse.ok) {
           setTransactions(await transactionResponse.json());
@@ -138,20 +134,24 @@ function Dashboard() {
                     <h3>
                       📦 {item?.name ?? `Item #${transaction.itemId}`}
                     </h3>
+
                     <p>
                       <strong>Person:</strong>{" "}
                       {transaction.personName}
                     </p>
+
                     <p>
                       <strong>Transaction Type:</strong>{" "}
                       {transaction.transactionType}
                     </p>
+
                     <p>
                       <strong>Expected Return:</strong>{" "}
                       {transaction.dueDate
                         ? String(transaction.dueDate).slice(0, 10)
                         : "Not specified"}
                     </p>
+
                     <p>
                       <strong>Status:</strong>{" "}
                       {isOverdue
