@@ -1,33 +1,18 @@
-<<<<<<< HEAD
+# Frontend dependencies and build output
 node_modules/
 dist/
+
+# Environment variables and secrets
 .env
 .env.*
 !.env.example
-/frontend/
-=======
-# Compiled class file
-*.class
 
-# Log file
-*.log
+# Backend build output
+backend/personal_item_lending/target/
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
->>>>>>> 3171d40f059497f332f4d5aeb01c9a1e85f7ea1d
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+/backend/

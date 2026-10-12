@@ -113,9 +113,50 @@ useEffect(() => {
           ))}
         </aside>
 
-        <main className="main-content">
-          {pages[activePage]}
-        </main>
+       
+<main className="main-content">
+  {activePage === "Dashboard" && (
+    <Dashboard
+      key={activePage}
+      items={items}
+      records={records}
+      returns={returns}
+    />
+  )}
+
+  {activePage === "Items" && (
+    <Items
+      items={items}
+      setItems={setItems}
+    />
+  )}
+
+  {activePage === "Lend / Borrow" && (
+    <LendBorrow
+      items={items}
+      records={records}
+      setRecords={setRecords}
+      setReturns={setReturns}
+    />
+  )}
+
+  {activePage === "Returns" && (
+    <Returns
+      records={records}
+      setRecords={setRecords}
+      returns={returns}
+      setReturns={setReturns}
+    />
+  )}
+
+  {activePage === "Reminders" && (
+    <Reminders
+      records={records}
+      returns={returns}
+    />
+  )}
+</main>
+
       </div>
     </div>
   );

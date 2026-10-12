@@ -1,104 +1,188 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function Items({ items, setItems }) {
-  const [itemName, setItemName] = useState("");
-  const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
+const API_URL = "http://localhost:8080/api/items";
 
-  function handleSubmit(e) {
-    e.preventDefault();
+export default function Items() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-    const newItem = {
-      id: Date.now(),
-      name: itemName.trim(),
-      category: category.trim(),
-      description: description.trim(),
-    };
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    status: "AVAILABLE",
+  });
 
-    setItems((previousItems) => [...previousItems, newItem]);
+  async function fetchItems() {
+    try {
+      setError("");
 
-    setItemName("");
-    setCategory("");
-    setDescription("");
+      const response = await fetch(API_URL);
 
-    alert("Item added successfully!");
+      if (!response.ok) {
+        throw new Error("Failed to fetch items.");
+      }
+
+      const data = await response.json();
+      setItems(data);
+    } catch (err) {
+      setError(
+        "Cannot connect to Spring Boot. Make sure the backend is running on port 8080."
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function deleteItem(id) {
-    setItems((previousItems) =>
-      previousItems.filter((item) => item.id !== id)
-    );
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add item.");
+      }
+
+      setForm({
+        name: "",
+        description: "",
+        status: "AVAILABLE",
+      });
+
+      setMessage("Item added successfully!");
+      await fetchItems();
+    } catch (err) {
+      setError(err.message || "Unable to add item.");
+    }
   }
 
   return (
-    <div>
-      <h1>📦 My Items</h1>
-      <p className="welcome">
-        Add and manage the personal items you own.
-      </p>
+    <main style={styles.container}>
+      <h1>Manage Items</h1>
+      <p>Add and manage the items you lend or borrow.</p>
 
-      <div className="section">
+      <form onSubmit={handleSubmit} style={styles.form}>
         <h2>Add New Item</h2>
 
-        <form onSubmit={handleSubmit}>
-          <label>Item Name</label>
-          <input
-            type="text"
-            placeholder="Enter item name"
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-            required
-          />
+        <label htmlFor="name">Item Name *</label>
+        <input
+          id="name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Enter item name"
+          required
+        />
 
-          <label>Category</label>
-          <input
-            type="text"
-            placeholder="e.g. Electronics, Stationery"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-          />
+        <label htmlFor="description">Description</label>
+        <textarea
+          id="description"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          placeholder="Enter description"
+        />
 
-          <label>Description</label>
-          <textarea
-            placeholder="Enter item details"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+        <label htmlFor="status">Status</label>
+        <select
+          id="status"
+          name="status"
+          value={form.status}
+          onChange={handleChange}
+        >
+          <option value="AVAILABLE">Available</option>
+          <option value="LENT">Lent</option>
+          <option value="BORROWED">Borrowed</option>
+        </select>
 
-          <button type="submit">➕ Add Item</button>
-        </form>
-      </div>
+        <button type="submit">Add Item</button>
+      </form>
 
-      <div className="section">
-        <h2>All Items ({items.length})</h2>
+      {message && <p style={styles.success}>{message}</p>}
+      {error && <p style={styles.error}>{error}</p>}
 
-        {items.length === 0 ? (
-          <p>No items added yet.</p>
+      <section>
+        <h2>Item List</h2>
+
+        {loading ? (
+          <p>Loading items...</p>
+        ) : items.length === 0 ? (
+          <p>No items found. Add your first item above.</p>
         ) : (
-          <div>
+          <div style={styles.list}>
             {items.map((item) => (
-              <div className="card" key={item.id}>
-                <h3>📦 {item.name}</h3>
-                <p><strong>Category:</strong> {item.category}</p>
+              <article key={item.id} style={styles.card}>
+                <h3>{item.name}</h3>
+                <p>{item.description || "No description"}</p>
                 <p>
-                  <strong>Description:</strong>{" "}
-                  {item.description || "No description provided"}
+                  <strong>Status:</strong> {item.status || "Available"}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => deleteItem(item.id)}
-                >
-                  🗑️ Delete Item
-                </button>
-              </div>
+              </article>
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
-export default Items;
+const styles = {
+  container: {
+    maxWidth: "900px",
+    margin: "30px auto",
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    maxWidth: "500px",
+    marginBottom: "30px",
+    padding: "20px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+  },
+  list: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "15px",
+  },
+  card: {
+    padding: "15px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+  },
+  success: {
+    color: "green",
+    marginBottom: "15px",
+  },
+  error: {
+    color: "red",
+    marginBottom: "15px",
+  },
+};
