@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 
 const TRANSACTIONS_API = "https://personal-item-lending-backend.onrender.com/api/transactions";
 const ITEMS_API = "https://personal-item-lending-backend.onrender.com/api/items";
-<<<<<<< HEAD
-=======
 
->>>>>>> c424e2c9ec3c4b96d54f55c39a3cad8e5ec7378a
 
 function Reminders() {
   const [records, setRecords] = useState([]);

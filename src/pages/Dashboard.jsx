@@ -18,6 +18,8 @@ function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadDashboard() {
       try {
         setError("");
@@ -25,33 +27,66 @@ function Dashboard() {
         const response = await fetch(`${API}/dashboard`);
 
         if (!response.ok) {
-          throw new Error(`Dashboard API error: ${response.status}`);
+          throw new Error(
+            `Dashboard request failed: HTTP ${response.status}`
+          );
         }
 
         const data = await response.json();
-        setStats(data);
 
-        const [transactionResponse, itemResponse] =
-          await Promise.all([
-            fetch(`${API}/transactions`),
-            fetch(`${API}/items`),
-          ]);
-
-        if (transactionResponse.ok) {
-          setTransactions(await transactionResponse.json());
+        if (!cancelled) {
+          setStats({
+            totalItems: data.totalItems ?? 0,
+            totalTransactions: data.totalTransactions ?? 0,
+            activeTransactions: data.activeTransactions ?? 0,
+            returnedTransactions: data.returnedTransactions ?? 0,
+            overdueTransactions: data.overdueTransactions ?? 0,
+            totalReturns: data.totalReturns ?? 0,
+          });
         }
 
-        if (itemResponse.ok) {
-          setItemList(await itemResponse.json());
+        const [transactionResult, itemResult] = await Promise.allSettled([
+          fetch(`${API}/transactions`),
+          fetch(`${API}/items`),
+        ]);
+
+        if (transactionResult.status === "fulfilled") {
+          const result = transactionResult.value;
+
+          if (result.ok) {
+            const data = await result.json();
+            if (!cancelled && Array.isArray(data)) {
+              setTransactions(data);
+            }
+          }
+        }
+
+        if (itemResult.status === "fulfilled") {
+          const result = itemResult.value;
+
+          if (result.ok) {
+            const data = await result.json();
+            if (!cancelled && Array.isArray(data)) {
+              setItemList(data);
+            }
+          }
         }
       } catch (err) {
-        setError(err.message || "Unable to connect to the backend.");
+        if (!cancelled) {
+          setError(err.message || "Unable to load dashboard data.");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     loadDashboard();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const today = new Date();
@@ -64,6 +99,7 @@ function Dashboard() {
   return (
     <div>
       <h1>📊 Dashboard</h1>
+
       <p className="welcome">
         Manage your personal items, lending and returns.
       </p>
@@ -122,8 +158,7 @@ function Dashboard() {
 
                 const dueDate = transaction.dueDate
                   ? new Date(
-                      String(transaction.dueDate).slice(0, 10) +
-                        "T00:00:00"
+                      `${String(transaction.dueDate).slice(0, 10)}T00:00:00`
                     )
                   : null;
 
@@ -137,12 +172,12 @@ function Dashboard() {
 
                     <p>
                       <strong>Person:</strong>{" "}
-                      {transaction.personName}
+                      {transaction.personName ?? "Not specified"}
                     </p>
 
                     <p>
                       <strong>Transaction Type:</strong>{" "}
-                      {transaction.transactionType}
+                      {transaction.transactionType ?? "Not specified"}
                     </p>
 
                     <p>
