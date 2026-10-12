@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 
-const DASHBOARD_API = "http://localhost:8080/api/dashboard";
-const TRANSACTIONS_API = "http://localhost:8080/api/transactions";
+const API = "https://personal-item-lending-backend.onrender.com/api";
 
-function Dashboard({ items = [], records = [], returns = [] }) {
+function Dashboard() {
   const [stats, setStats] = useState({
     totalItems: 0,
+    totalTransactions: 0,
     activeTransactions: 0,
     returnedTransactions: 0,
     overdueTransactions: 0,
+    totalReturns: 0,
   });
 
   const [transactions, setTransactions] = useState([]);
@@ -21,39 +22,35 @@ function Dashboard({ items = [], records = [], returns = [] }) {
       try {
         setError("");
 
-        const [dashboardResponse, transactionsResponse, itemsResponse] =
-          await Promise.all([
-            fetch(DASHBOARD_API),
-            fetch(TRANSACTIONS_API),
-            fetch("http://localhost:8080/api/items"),
-          ]);
-
-        if (
-          !dashboardResponse.ok ||
-          !transactionsResponse.ok ||
-          !itemsResponse.ok
-        ) {
-          throw new Error("Failed to load dashboard data.");
+        const response = await fetch(`${API}/dashboard`);
+        if (!response.ok) {
+          throw new Error(`Dashboard API error: ${response.status}`);
         }
 
-        const dashboardData = await dashboardResponse.json();
-        const transactionData = await transactionsResponse.json();
-        const itemsData = await itemsResponse.json();
+        const data = await response.json();
+        setStats(data);
 
-        setStats(dashboardData);
-        setTransactions(transactionData);
-        setItemList(itemsData);
+        const [transactionResponse, itemResponse] = await Promise.all([
+          fetch(`${API}/transactions`),
+          fetch(`${API}/items`),
+        ]);
+
+        if (transactionResponse.ok) {
+          setTransactions(await transactionResponse.json());
+        }
+
+        if (itemResponse.ok) {
+          setItemList(await itemResponse.json());
+        }
       } catch (err) {
-        setError(
-          err.message || "Unable to connect to the backend."
-        );
+        setError(err.message || "Unable to connect to the backend.");
       } finally {
         setLoading(false);
       }
     }
 
     loadDashboard();
-  }, [items, records, returns]);
+  }, []);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -78,22 +75,32 @@ function Dashboard({ items = [], records = [], returns = [] }) {
           <div className="cards">
             <div className="card">
               <h3>📦 Total Items</h3>
-              <p>{stats.totalItems ?? 0}</p>
+              <p>{stats.totalItems}</p>
             </div>
 
             <div className="card">
-              <h3>🔄 Active Transactions</h3>
-              <p>{stats.activeTransactions ?? 0}</p>
+              <h3>🔄 Total Transactions</h3>
+              <p>{stats.totalTransactions}</p>
             </div>
 
             <div className="card">
-              <h3>✅ Returned Items</h3>
-              <p>{stats.returnedTransactions ?? 0}</p>
+              <h3>📤 Active Transactions</h3>
+              <p>{stats.activeTransactions}</p>
+            </div>
+
+            <div className="card">
+              <h3>✅ Returned Transactions</h3>
+              <p>{stats.returnedTransactions}</p>
             </div>
 
             <div className="card">
               <h3>⚠️ Overdue Transactions</h3>
-              <p>{stats.overdueTransactions ?? 0}</p>
+              <p>{stats.overdueTransactions}</p>
+            </div>
+
+            <div className="card">
+              <h3>↩️ Total Returns</h3>
+              <p>{stats.totalReturns}</p>
             </div>
           </div>
 
@@ -102,12 +109,13 @@ function Dashboard({ items = [], records = [], returns = [] }) {
 
             {pendingReturns.length === 0 ? (
               <div className="empty">
-                All items have been returned.
+                No active transactions.
               </div>
             ) : (
               pendingReturns.map((transaction) => {
                 const item = itemList.find(
-                  (entry) => entry.id === transaction.itemId
+                  (entry) =>
+                    String(entry.id) === String(transaction.itemId)
                 );
 
                 const dueDate = transaction.dueDate
@@ -121,25 +129,23 @@ function Dashboard({ items = [], records = [], returns = [] }) {
 
                 return (
                   <div className="card" key={transaction.id}>
-                    <h3>📦 {item?.name ?? `Item #${transaction.itemId}`}</h3>
-
+                    <h3>
+                      📦 {item?.name ?? `Item #${transaction.itemId}`}
+                    </h3>
                     <p>
                       <strong>Person:</strong>{" "}
                       {transaction.personName}
                     </p>
-
                     <p>
                       <strong>Transaction Type:</strong>{" "}
                       {transaction.transactionType}
                     </p>
-
                     <p>
                       <strong>Expected Return:</strong>{" "}
                       {transaction.dueDate
                         ? String(transaction.dueDate).slice(0, 10)
                         : "Not specified"}
                     </p>
-
                     <p>
                       <strong>Status:</strong>{" "}
                       {isOverdue
