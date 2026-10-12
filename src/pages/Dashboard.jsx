@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-const DASHBOARD_API = "http://localhost:8080/api/dashboard";
-const TRANSACTIONS_API = "http://localhost:8080/api/transactions";
+const DASHBOARD_API = "https://personal-item-lending-backend.onrender.com/api/dashboard";
+const TRANSACTIONS_API = "https://personal-item-lending-backend.onrender.com/api/transactions";
+
 
 function Dashboard({ items = [], records = [], returns = [] }) {
   const [stats, setStats] = useState({
